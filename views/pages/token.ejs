@@ -1,0 +1,125 @@
+<script type="text/javascript" src="/0x.js"></script>
+<script type="text/javascript" src="/AssetBuyer.js"></script>
+<script type="text/javascript" src="/Web3Wrapper.js"></script>
+<script type="text/javascript" src="/getContractAddressesForNetworkOrThrow.js"></script>
+<script type="text/javascript" src="/SubProviders.js"></script>
+<script type="text/javascript" src="/ContractArtifacts.js"></script>
+<script type="text/javascript" src="/AbiGenWrappers.js"></script>
+
+
+<div id="token" v-cloak>
+  <div class="container d-flex flex-column justify-content-center">
+    <div class="row main">
+        <div class="col-12 col-sm-3 profile-main-area block" >
+          <div class='profile-div'>
+            <img class='profile-pic' style="max-width: 100%; height: auto;" aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.svg'" alt="Token picture"  >  
+            <div class='lateral-padding'>
+                <p class='gimme-space' >#{{tokenid}}</p>
+                <a class="btn btn-outline-info btn-block gimme-space" href="/faq">Follow</a>
+                <a class='link-lighter smaller-text' v-bind:href="'https://www.cryptokitties.co/kitty/'+tokenid" target="_blank">View on CryptoKitties</a>
+            </div>
+            <div class='mt30 lateral-padding'>
+                    <p class='gimme-space' >Rarity: <span class='positive-indicator'>{{rarity_index}}</span> - <a class='link smaller-text' href="#">See stats</a></p>
+                 
+                </div>
+          </div>
+          <div class='mtb20 total-padding' id='buy-area' style="display:none ">
+            <p style="margin-bottom: 0px;">On sale: <span class='price-text'>0.0022 ETH</span></p>
+            <ajax-button type="submit" :syncing="syncingTransaction" class="btn btn-warning btn-block gimme-space" @click="signTransaction(tokenid)">Buy now</ajax-button> 
+
+          </div>
+          <div class='below-space total-padding' id='sell-area' style="display:none ">
+            <a class="btn btn-warning btn-block" href="#">Sell</a>
+          </div>
+        </div>
+        
+        <div class="col-12 col-sm-9">
+          <div class="col-12 block-container">
+              <div class="col-12 block">
+                <textarea class="form-control send-message-box" id="message" name="message" v-model.trim="msg" placeholder="What's up? Ask a question or just leave a message!" autocomplete="none"></textarea>
+                <a class="btn btn-info btn-sm btn-send-message" href="#" @click="sendMsg()" >Send</a>
+              </div>
+              <ajax-button id="message-loader" type="submit" :syncing="syncingAlways" class="always-loader btn-block"> </ajax-button> 
+
+
+              <template v-for='el in feed'>
+                  <div class="col-12 block block-feed" v-if='!el.res_event'>
+                        <img class='feed-pic' aria-label="Owner picture" v-bind:src="'https://robohash.org/'+el.from_address+'.png?size=45x45'" alt="Owner picture" width="45" height="45" >
+                        <div class='feed-msg' >
+                            <a class='link' style="font-size:0.8em" v-bind:href="'/address/'+el.from_address">{{el.from_address}}</a>
+                            <br/>
+                            <js-timestamp class='link-lighter' style="font-size:0.8em; position:relative; top:-5px" :at="el.date" format="timeago" short="true"></js-timestamp>
+                            <p class='feed-msg-text'>
+                                Hey @<a class='link' v-bind:href="'/token/cryptokitties/'+el.token_id">{{el.token_id}}</a>, you are now on <a class='link' v-bind:href="/buy_widget/">auction</a>!
+                            </p>
+                        </div>
+                  </div>
+                  <div class="col-12 block block-feed" v-if="el.res_event=='AuctionSuccessful'">
+                      <img class='feed-pic' aria-label="Owner picture" v-bind:src="'https://robohash.org/'+el.res_winner+'.png?size=45x45'" alt="Owner picture" width="45" height="45" >
+                      <div class='feed-msg' >
+                          <a class='link' style="font-size:0.8em" v-bind:href="'/address/'+el.res_winner">{{el.res_winner}}</a>
+                          <br/>
+                          <js-timestamp class='link-lighter' style="font-size:0.8em; position:relative; top:-5px" :at="el.res_date" format="timeago" short="true"></js-timestamp>
+                          <p class='feed-msg-text'>
+                              Finally you are mine, @<a class='link' v-bind:href="'/token/cryptokitties/'+el.token_id">{{el.token_id}}</a>
+                              <br/>
+                              {{el.res_total_price}} ETH well spent!
+                          </p>
+                      </div>
+                  </div>
+                  <div class="col-12 block block-feed" v-if="el.res_event=='AuctionCancelled'">
+                      <img class='feed-pic' aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.svg'" alt="Token picture" width="45" height="45" >
+                      <div class='feed-msg' >
+                          <a class='link' style="font-size:0.8em" v-bind:href="'/token/cryptokitties/'+tokenid">{{tokenid}}</a>
+                          <br/>
+                          <js-timestamp class='link-lighter' style="font-size:0.8em; position:relative; top:-5px" :at="el.res_date" format="timeago" short="true"></js-timestamp>
+                          <p class='feed-msg-text'>
+                              My owner cancelled the auction!
+                              <br/>
+                              Happy to stay with you, @<a class='link'  v-bind:href="'/address/'+el.from_address">{{el.from_address}}</a> :)
+                          </p>
+                      </div>
+                  </div>
+                  <div class="col-12 block block-feed" v-if="el.res_event=='Message'">
+                    <img class='feed-pic' aria-label="Owner picture" v-bind:src="'https://robohash.org/'+el.from_address+'.png?size=45x45'" alt="Owner picture" width="45" height="45" >
+                    <div class='feed-msg' >
+                        <a class='link' style="font-size:0.8em" v-bind:href="'/address/'+el.from_address">{{el.from_address}}</a>
+                        <br/>
+                        <js-timestamp class='link-lighter' style="font-size:0.8em; position:relative; top:-5px" :at="el.date" format="timeago" short="true"></js-timestamp>
+                        <p class='feed-msg-text'>
+                            <template v-if='el.to_address'>Hey @<a class='link' v-bind:href="'/address/'+el.to_address">{{el.to_address}}</a>! <br/> </template>
+                            {{el.text}}
+                        </p>
+                    </div>
+                </div>
+              </template>
+
+
+              <div class="col-12 block block-feed">
+                <img class='feed-pic' aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.svg'" alt="Token picture" width="45" height="45" >
+                <div class='feed-msg'>
+                    <a class='link' style="font-size:0.8em" v-bind:href="'/token/cryptokitties/'+tokenid">{{tokenid}}</a>
+                    <br/>
+                    <js-timestamp class='link-lighter' style="font-size:0.8em; position:relative; top:-5px" :at="date" format="timeago" short="true"></js-timestamp>
+                    <p class='feed-msg-text'>I was born! Thanks moms, 
+                        @<a class='link'  v-bind:href="'/token/cryptokitties/'+matronid">{{matronid}}</a>
+                        @<a class='link'  v-bind:href="'/token/cryptokitties/'+sireid">{{sireid}}</a>.
+                        <br/>
+                        Now I belong to @<a class='link'  v-bind:href="'/address/'+owner">{{owner}}</a>.
+                    </p>
+                </div>
+              </div>
+
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+    
+    
+  
+  </div>
+
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

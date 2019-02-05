@@ -1,0 +1,60 @@
+.link{
+  color: @link;
+}
+.link-lighter{
+  color: @text-muted;
+}
+
+
+
+.btn-send-message{
+  top: -40px;
+  right: 10px;
+  position: relative;
+  float:right;
+}
+
+.btn-reset() {
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  &:focus {
+    border-image: none;
+    outline: none;
+  }
+}
+
+
+.ajax-button() {
+  .button-loader, .button-loading {
+    .loader();
+    display: none;
+    .loading-dot {
+      width: 7px;
+      height: 7px;
+      margin: 0px 3px;
+      display: inline;
+    }
+  }
+  &.syncing {
+    .button-loader, .button-loading {
+      display: inline-block;
+    }
+    .button-text {
+      display: none;
+    }
+  }
+}
+
+.always-loader{
+  display:none;
+  cursor: default;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  border:0px !important;
+  background-color: #eef5f9b8 !important;
+}

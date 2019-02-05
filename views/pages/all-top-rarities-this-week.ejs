@@ -1,0 +1,74 @@
+<div id="all-top-rarities-this-week" v-cloak>
+    <div class="d-flex flex-column justify-content-center">
+
+    <div class="container ">
+    
+    <script type="text/x-template" id="table-template">
+      <div class="table-responsive">
+        
+        <table class="table table-light table-hover">
+        <caption>{{title}} - <a class="link" :href="'/'+moreResultsLink">See more</a></caption>
+        <thead class='td-lighter'>
+          <tr>
+            <th v-for="keyter in columns"
+              
+              @click="sortBy(keyter)"
+              :class="{ active: sortKey == keyter }">
+              {{keyter}}
+              <span class="arrow" :class="sortOrders[keyter] > 0 ? 'asc' : 'dsc'">
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="entry in filteredData" >
+            <td  style='align-self-cente' v-for="keyter in columns">
+
+              <js-timestamp class='td-lighter' v-if="keyter=='Released'" :at="entry[keyter]" format="calendar-time"></js-timestamp>
+              <img v-if="keyter=='Token'" aria-label="Token picture" style="margin-right:4px; display: inline; vertical-align: middle;" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+entry[keyter]+'.svg'" alt="Token picture" width="45" height="45" >
+              <template v-if="keyter=='Token'"><a class='link' v-bind:href="'/token/cryptokitties/'+entry[keyter]">{{entry[keyter]}}</a> </template>
+              <span v-if="keyter=='Pos'" class='td-lighter'>{{entry[keyter]}} </span>
+              <span v-if="keyter=='Rarity'" class='positive-indicator'>{{entry[keyter]}} </span>
+              <a v-if="keyter=='Seller'" class='link' style=' text-overflow: ellipsis; white-space: nowrap; max-width: 200px; overflow: hidden !important; display: inline-flex;' v-bind:href="'/address/'+entry[keyter]">{{entry[keyter]}} </a>
+              <span v-if="keyter=='Sales' " class='price-text'>{{entry[keyter]}} ETH</span>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+    </div>
+    </script>
+    
+    <div class="title">
+      <div class="container col-12">
+          <div class="icon">
+            <i class="fa fa-line-chart"></i>
+          </div>
+          <div class="text">
+            <h3 class="display-6">Rarity Rankings</h3>
+            <p>Rarest tokens released this week <a class='smaller-text link-lighter' href="#">- How is the rarity index calculated?</a></p>
+          </div>
+      </div>
+    </div>
+    
+  </div>
+    <div class="content">
+      <div class="container table-container">
+        <div class="row">
+          <div class="col-12">
+            <table-grid
+              :data="gridData"
+              :columns="gridColumns"
+              :filter-key="searchQuery"
+              :data-updated="homeTopReleases"
+              :title="title"
+              :more-results-link="moreResultsLink">       
+            </table-grid>
+          </div>
+        </div>
+      </div>    
+    </div>
+</div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
