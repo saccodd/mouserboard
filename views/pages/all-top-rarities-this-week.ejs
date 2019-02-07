@@ -4,38 +4,54 @@
     <div class="container ">
     
     <script type="text/x-template" id="table-template">
-      <div class="table-responsive">
+      <div class="table-responsive text-center">
         
-        <table class="table table-light table-hover">
-        <caption>{{title}} - <a class="link" :href="'/'+moreResultsLink">See more</a></caption>
-        <thead class='td-lighter'>
-          <tr>
-            <th v-for="keyter in columns"
-              
-              @click="sortBy(keyter)"
-              :class="{ active: sortKey == keyter }">
-              {{keyter}}
-              <span class="arrow" :class="sortOrders[keyter] > 0 ? 'asc' : 'dsc'">
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="entry in filteredData" >
-            <td  style='align-self-cente' v-for="keyter in columns">
+          <table class="table table-light table-hover" >
+            <caption>{{title}} - <a class="link" :href="'/'+moreResultsLink">See more</a></caption>
+            <thead class='td-lighter'>
+              <tr>
+              <template v-for="keyter in columns">
+                <th v-if="keyter=='Sales'" style='width: 150px'
+                  
+                  @click="sortBy(keyter)"
+                  :class="{ active: sortKey == keyter }">
+                  {{keyter}}
+                  <span class="arrow" :class="sortOrders[keyter] > 0 ? 'asc' : 'dsc'">
+                  </span>
+                </th>
+                <th v-else
+                  
+                  @click="sortBy(keyter)"
+                  :class="{ active: sortKey == keyter }">
+                  {{keyter}}
+                  <span class="arrow" :class="sortOrders[keyter] > 0 ? 'asc' : 'dsc'">
+                  </span>
+                </th>
+              </template>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="entry in filteredData" >
+                <template v-for="keyter in columns">
+                    <td v-if="keyter=='Pos'" class="" style='width: 50px' >
+                      <span  class='td-lighter'>{{entry[keyter]}} </span>
+                    </td>
+                    <td v-else class="" style='' >
+  
+                        <js-timestamp class='td-lighter address' v-if="keyter=='Released' " :at="entry[keyter]" format="timeago" short="true"></js-timestamp>
+                        <img v-if="keyter=='Token' " aria-label="Token picture" style="margin-right:4px; display: inline; vertical-align: middle;" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+entry[keyter]+'.png'" alt="Token picture" width="45" height="45" >
+                        <template v-if="keyter=='Token' "><a class='link-lighter' v-bind:href="'/token/cryptokitties/'+entry[keyter]">{{entry[keyter]}}</a> </template>
+                        <span v-if="keyter=='Rarity'" class='positive-indicator'>{{entry[keyter]}} </span>
+                        <a class='link-lighter address' v-if="keyter=='Seller'" href="#">{{entry[keyter]}} </a>
+                        <span v-if="keyter=='Sales'" class='price-text'>{{entry[keyter]}} ETH</span>
+                        <a class='link-lighter address' v-if="keyter=='Owner'" href="#">{{entry[keyter]}} </a>
+                        <a class='link-lighter address' v-if="keyter=='Transaction'" target="_blank" v-bind:href="'https://etherscan.io/tx/'+entry[keyter]">{{entry[keyter]}} </a>
 
-              <js-timestamp class='td-lighter' v-if="keyter=='Released'" :at="entry[keyter]" format="calendar-time"></js-timestamp>
-              <img v-if="keyter=='Token'" aria-label="Token picture" style="margin-right:4px; display: inline; vertical-align: middle;" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+entry[keyter]+'.svg'" alt="Token picture" width="45" height="45" >
-              <template v-if="keyter=='Token'"><a class='link' v-bind:href="'/token/cryptokitties/'+entry[keyter]">{{entry[keyter]}}</a> </template>
-              <span v-if="keyter=='Pos'" class='td-lighter'>{{entry[keyter]}} </span>
-              <span v-if="keyter=='Rarity'" class='positive-indicator'>{{entry[keyter]}} </span>
-              <a v-if="keyter=='Seller'" class='link' style=' text-overflow: ellipsis; white-space: nowrap; max-width: 200px; overflow: hidden !important; display: inline-flex;' v-bind:href="'/address/'+entry[keyter]">{{entry[keyter]}} </a>
-              <span v-if="keyter=='Sales' " class='price-text'>{{entry[keyter]}} ETH</span>
-
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                      </td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
       
     </div>
     </script>
@@ -46,7 +62,7 @@
             <i class="fa fa-line-chart"></i>
           </div>
           <div class="text">
-            <h3 class="display-6">Rarity Rankings</h3>
+            <h3 class="display-6">Rarity Ranking</h3>
             <p>Rarest tokens released this week <a class='smaller-text link-lighter' href="#">- How is the rarity index calculated?</a></p>
           </div>
       </div>

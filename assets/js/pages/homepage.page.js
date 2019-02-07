@@ -102,7 +102,6 @@ parasails.registerPage('homepage', {
       var updatedGridData=[];
       var self=this;
       $.getJSON( "/api/v1/home-top-releases", function( data ) {
-        //console.log(data)
         data.forEach(function(el,i){
           updatedGridData[i]= { Pos: i+1, Token: el.token_id,Released: el.date,Rarity: el.rarity_index }
         })
@@ -117,7 +116,6 @@ parasails.registerPage('homepage', {
       var updatedGridData=[];
       var self=this;
       $.getJSON( "/api/v1/home-top-sellers", function( data ) {
-        //console.log(data)
         data.forEach(function(el,i){
           updatedGridData[i]= { Pos: i+1, Seller: el.from_address,Sales: el.total_sales }
         })

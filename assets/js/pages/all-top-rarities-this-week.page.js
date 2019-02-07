@@ -11,11 +11,11 @@ parasails.registerPage('all-top-rarities-this-week', {
     homeTopReleases: false,
     title:'Rare collectibles of the week',
     moreResultsLink:'all-top-rarities-this-week',
-    gridColumns: ['Pos','Token', 'Released', 'Rarity'],
+    gridColumns: ['Pos','Token','Owner', 'Transaction',  'Released', 'Rarity'],
     gridData: [
-      { Pos: '1', Token:'',Released: '',Rarity:'' },
-      { Pos: '2', Token:'',Released: '',Rarity:'' },
-      { Pos: '3', Token:'',Released: '',Rarity:'' },
+      { Pos: '1', Token:'',Owner: '',Transaction: '',Released: '',Rarity:'' },
+      { Pos: '2', Token:'',Owner: '',Transaction: '',Released: '',Rarity:'' },
+      { Pos: '3', Token:'',Owner: '',Transaction: '',Released: '',Rarity:'' },
     ],
   },
 
@@ -27,7 +27,6 @@ parasails.registerPage('all-top-rarities-this-week', {
     _.extend(this, SAILS_LOCALS);
   },
   mounted: async function() {
-    console.log(this.gridData)
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗

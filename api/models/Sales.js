@@ -1,11 +1,12 @@
 /**
  * Sales
  *
- * @description :: A model definition.  Represents a database table/collection/etc.
+ * @description :: A sale definition.  Represents an auction, that can be open, successful, or cancelled
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
 module.exports = {
+    tableName: 'sales_subset',
 
     attributes: {
       token_id:{

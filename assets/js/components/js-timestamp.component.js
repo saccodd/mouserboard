@@ -45,6 +45,11 @@ parasails.registerComponent('jsTimestamp', {
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
   beforeMount: function() {
+    // FIXME Override now() for demo purposes - forced to February 3rd, 2019
+    moment.now = function () {
+        return +new Date(2019, 1, 3); 
+    }
+
     if (this.at === undefined) {
       throw new Error('Incomplete usage of <js-timestamp>:  Please specify `at` as a JS timestamp (i.e. epoch ms, a number).  For example: `<js-timestamp :at="something.createdAt">`');
     }
@@ -97,13 +102,14 @@ parasails.registerComponent('jsTimestamp', {
   methods: {
 
     _formatTimeago: function() {
-      var now = new Date().getTime();
+      //var now = new Date().getTime();
+      var now= moment().valueOf()
       var at_variable= new Date(this.at)
       var timeDifference = Math.abs(now - at_variable);
       
       // If the timestamp is less than a day old, format as time ago.
-      // FIX ME remove 365 or change it
-      if(timeDifference < 1000*60*60*24*365) {
+      // FIXME remove 14 (back to original, as above) or change it further
+      if(timeDifference < 1000*60*60*24*14) {
         this.formattedTimestamp = moment(this.at).fromNow();
       } else {
         // If the timestamp is less than a month-ish old, we'll include the

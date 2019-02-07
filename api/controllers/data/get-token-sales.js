@@ -27,14 +27,7 @@ module.exports = {
             token_id: token_id}).sort([{date: 'desc'}]);
            
         if (!sales || sales.length==0) { throw 'notFound'; }
-        /*
-        sales.forEach(function(el, i){
-            //date_t=new Date(el.date);
-            el.from_address=el._id
-            el.total_sales=Math.round(el.total_sales*100)/100
-            //el.date=date_t.toLocaleString('en-us', { month: 'short' })+' '+date_t.getDate();
-            sales[i]=el;
-        })*/
+
         return exits.success(sales); 
     }
   

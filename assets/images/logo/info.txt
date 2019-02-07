@@ -1,0 +1,17 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+
+font name: Michroma
+font link: https://fonts.google.com/specimen/Michroma
+font author: Vernon Adams
+font author site: http://sansoxygen.com/
+
+icon designer: Thomas Le Bas
+icon designer link: /tlb
+        
+
+fontColor: {"hex":"#14acc2"}
+bgColor: {"hex":"#FFFFFF"}
+iconColor: {"hex":"#14acc2"}
+      

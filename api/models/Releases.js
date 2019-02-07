@@ -1,11 +1,12 @@
 /**
  * Releases
  *
- * @description :: A model definition.  Represents a database table/collection/etc.
+ * @description :: A release definition. Represents when a token is minted
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
 module.exports = {
+    tableName: 'releases_subset',
 
     attributes: {
       token_id:{

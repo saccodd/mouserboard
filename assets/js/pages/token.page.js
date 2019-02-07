@@ -7,6 +7,7 @@ parasails.registerPage('token', {
     updatedFeed: false, 
     feed:[],
     msg:"",
+    modalMessage:"",
     syncingTransaction: false,
     syncingAlways: true
   },
@@ -21,7 +22,23 @@ parasails.registerPage('token', {
   },
   mounted: async function() {
     this._updateFeed();
-    
+    try{
+      web3.version.getNetwork((err, netId) => {
+        if (netId!=42){
+          this.modalMessage="Wrong network. Please use Kovan"
+          $('#warningModal').modal({
+              backdrop: 'static',
+              keyboard: false
+          })
+        }
+      })
+    } catch(error){
+      this.modalMessage="Please install a wallet bridge (e.g. Metamask) and reload"
+      $('#warningModal').modal({
+          backdrop: 'static',
+          keyboard: false
+      })
+    }
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -43,7 +60,10 @@ parasails.registerPage('token', {
       });
     },
     signTransaction: async function(tok_id){
+
       this.syncingTransaction=true
+
+      //defining constants
       const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new ZeroEx.BigNumber(2).pow(256).minus(1);
       const DECIMALS = 18;
       const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -55,11 +75,12 @@ parasails.registerPage('token', {
       const ONE_SECOND_MS = 1000;
       const ONE_MINUTE_MS = ONE_SECOND_MS * 60;
       const TEN_MINUTES_MS = ONE_MINUTE_MS * 10;
-
-      var contractAddresses = getContractAddressesForNetworkOrThrow(42); //Addresses for Kovan
+      // get 0x addresses for Kovan
+      var contractAddresses = getContractAddressesForNetworkOrThrow(42); 
+      // encode Weth token for taker payment
       var wethTokenAddress = contractAddresses.etherToken;
-
       const takerAssetData = ZeroEx.assetDataUtils.encodeERC20AssetData(wethTokenAddress);
+      
       var provider = window.web3.currentProvider.isMetaMask
                               ? new ZeroEx.MetamaskSubprovider(window.web3.currentProvider)
                               : window.web3.currentProvider;
@@ -67,11 +88,16 @@ parasails.registerPage('token', {
       const availableAddresses = await web3Wrapper.getAvailableAddressesAsync();
       const firstAvailableAddress = _.head(availableAddresses);
       const taker = firstAvailableAddress;
-      const maker = '0x5409ed021d9299bf6814279a6a1411a7e866a631' // kovan
+      
+      // define maker for minting at runtime and selling on Kovan
+      const maker = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 
+      // some console logging
       console.log(maker)
       console.log(taker)
 
+
+      // initiate  minting
       const mnemonicWallet = new SubProviders.MnemonicWalletSubprovider({
           mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
           baseDerivationPath: "44'/60'/0'/0",
@@ -88,18 +114,19 @@ parasails.registerPage('token', {
       const dummyERC721TokenContract = new AbiGenWrappers.DummyERC721TokenContract(ContractArtifacts.DummyERC721Token.compilerOutput.abi, tokenAddress, providerEngine);
       console.log("ERC721 address: "+dummyERC721TokenContract.address)
       
+      // mint random token
       const tokenId = ZeroEx.generatePseudoRandomSalt();
-      var makerAssetData=ZeroEx.assetDataUtils.encodeERC721AssetData(dummyERC721TokenContract.address,tokenId)
+      const mintTxHash = await dummyERC721TokenContract.mint.sendTransactionAsync(maker, tokenId, { from: maker });
 
+      // define data for order
+      var makerAssetData=ZeroEx.assetDataUtils.encodeERC721AssetData(dummyERC721TokenContract.address,tokenId)
       const makerAssetAmount = Web3Wrapper.toBaseUnitAmount(new ZeroEx.BigNumber(1), 0);
       const takerAssetAmount = Web3Wrapper.toBaseUnitAmount(new ZeroEx.BigNumber(22), 14);
       let txHash = null;
 
-      const mintTxHash = await dummyERC721TokenContract.mint.sendTransactionAsync(maker, tokenId, { from: maker });
-
-      console.log(contractWrappers.erc721Token)
-      // Allow the 0x ERC721 Proxy to move ERC721 tokens on behalf of maker
+      
       try{
+        // Allow the 0x ERC721 Proxy to move ERC721 tokens on behalf of maker
         const makerERC721ApprovalTxHash = await contractWrappers.erc721Token.setProxyApprovalForAllAsync(
             dummyERC721TokenContract.address,
             maker,
@@ -110,7 +137,7 @@ parasails.registerPage('token', {
             }
         );
         
-        // We make a new object here just so we prune any extra data that we may have attached to the order
+        // create order at runtime
         let order = {
             exchangeAddress: "0x35dd2932454449b14cee11a94d3674a936d5d7b2", // Exchange address for Kovan
             expirationTimeSeconds: this._getRandomFutureDateInSeconds(),
@@ -127,51 +154,46 @@ parasails.registerPage('token', {
             takerFee: ZERO
         }
         
-
+        // sign maker order
         const orderHashHex = ZeroEx.orderHashUtils.getOrderHashHex(order);
-
         const signature = await ZeroEx.signatureUtils.ecSignHashAsync(providerEngine, orderHashHex, maker);
-
         const signedOrder = { ...order, signature };
-
-      
-
         
+        // execute transaction
         const contractWrappersTaker = new ZeroEx.ContractWrappers(provider, { networkId: 42 }); // do it on Kovan
-          txHash = await contractWrappersTaker.forwarder.marketBuyOrdersWithEthAsync(
-              [signedOrder],
-              order.makerAssetAmount,
-              taker,
-              order.takerAssetAmount,
-              [],
-              0,
-              NULL_ADDRESS,
-              {
-                  gasLimit: 400000,
-              },
-          );
-          console.log(txHash)
-          
-          tx_conf=await web3Wrapper.awaitTransactionSuccessAsync(txHash);
-          console.log(tx_conf)
-          var msg = {
-            date: new Date(),
-            from_address: "0x88ba6d5a7abe727d73b0f4c7965775b959646f7e",
-            id: "5c45f70a22b6cbfc23afd439",
-            res_date: new Date(),
-            res_event: "AuctionSuccessful",
-            res_total_price: 0.13,
-            res_winner: taker,
-            token_id: tok_id,
+        txHash = await contractWrappersTaker.forwarder.marketBuyOrdersWithEthAsync(
+            [signedOrder],
+            order.makerAssetAmount,
+            taker,
+            order.takerAssetAmount,
+            [],
+            0,
+            NULL_ADDRESS,
+            {
+                gasLimit: 400000,
+            },
+        );
+        console.log(txHash)
+        
+        tx_conf=await web3Wrapper.awaitTransactionSuccessAsync(txHash);
+        
+        // print successful transaction message
+        var msg = {
+          date: moment(),
+          from_address: "0x88ba6d5a7abe727d73b0f4c7965775b959646f7e",
+          id: "5c45f70a22b6cbfc23afd439",
+          res_date: moment(),
+          res_event: "AuctionSuccessful",
+          res_total_price: 0.0022,
+          res_winner: taker,
+          token_id: tok_id,
 
-          }
-          this._addMessage(msg);
-          this._changeMarketButton();
         }
-        catch(error)
-        {
-            console.log(error);
-        }
+        this._addMessage(msg);
+        this._changeMarketButton();
+      } catch(error){
+          console.log(error);
+      }
       this.syncingTransaction=false
       providerEngine.stop();
     },
@@ -203,14 +225,13 @@ parasails.registerPage('token', {
       if (!comment){
         newMsg={
           text: self.msg,
-          date: new Date(),
+          date: moment(),
           from_address: user_address,
           res_event: "Message",
         }
       }else{
         newMsg=comment
       }
-      console.log(self.feed);
       if (self.feed.length==0){
         self.feed=[newMsg]
       }else{
@@ -239,7 +260,7 @@ parasails.registerPage('token', {
           var text="I was about to submit it for sale here, check it out"
           var newMsg={
             text: text,
-            date: new Date(),
+            date: moment(),
             from_address: from_address,
             res_event: "Message",
             to_address: user_address,

@@ -1,10 +1,10 @@
-<script type="text/javascript" src="/0x.js"></script>
-<script type="text/javascript" src="/AssetBuyer.js"></script>
-<script type="text/javascript" src="/Web3Wrapper.js"></script>
-<script type="text/javascript" src="/getContractAddressesForNetworkOrThrow.js"></script>
-<script type="text/javascript" src="/SubProviders.js"></script>
-<script type="text/javascript" src="/ContractArtifacts.js"></script>
-<script type="text/javascript" src="/AbiGenWrappers.js"></script>
+<script type="text/javascript" src="/js/page-specific-components/0x.js"></script>
+<script type="text/javascript" src="/js/page-specific-components/AssetBuyer.js"></script>
+<script type="text/javascript" src="/js/page-specific-components/Web3Wrapper.js"></script>
+<script type="text/javascript" src="/js/page-specific-components/getContractAddressesForNetworkOrThrow.js"></script>
+<script type="text/javascript" src="/js/page-specific-components/SubProviders.js"></script>
+<script type="text/javascript" src="/js/page-specific-components/ContractArtifacts.js"></script>
+<script type="text/javascript" src="/js/page-specific-components/AbiGenWrappers.js"></script>
 
 
 <div id="token" v-cloak>
@@ -12,7 +12,7 @@
     <div class="row main">
         <div class="col-12 col-sm-3 profile-main-area block" >
           <div class='profile-div'>
-            <img class='profile-pic' style="max-width: 100%; height: auto;" aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.svg'" alt="Token picture"  >  
+            <img class='profile-pic' style="max-width: 100%; height: auto;" aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.png'" alt="Token picture"  >  
             <div class='lateral-padding'>
                 <p class='gimme-space' >#{{tokenid}}</p>
                 <a class="btn btn-outline-info btn-block gimme-space" href="/faq">Follow</a>
@@ -68,7 +68,7 @@
                       </div>
                   </div>
                   <div class="col-12 block block-feed" v-if="el.res_event=='AuctionCancelled'">
-                      <img class='feed-pic' aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.svg'" alt="Token picture" width="45" height="45" >
+                      <img class='feed-pic' aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.png'" alt="Token picture" width="45" height="45" >
                       <div class='feed-msg' >
                           <a class='link' style="font-size:0.8em" v-bind:href="'/token/cryptokitties/'+tokenid">{{tokenid}}</a>
                           <br/>
@@ -96,7 +96,7 @@
 
 
               <div class="col-12 block block-feed">
-                <img class='feed-pic' aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.svg'" alt="Token picture" width="45" height="45" >
+                <img class='feed-pic' aria-label="Token picture" v-bind:src="'https://img.cryptokitties.co/0x06012c8cf97bead5deae237070f9587f8e7a266d/'+tokenid+'.png'" alt="Token picture" width="45" height="45" >
                 <div class='feed-msg'>
                     <a class='link' style="font-size:0.8em" v-bind:href="'/token/cryptokitties/'+tokenid">{{tokenid}}</a>
                     <br/>
@@ -119,7 +119,17 @@
     
     
   
-  </div>
+    <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="modalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLongTitle">{{modalMessage}}</h5>
+                    
+                </div>
 
+
+            </div>
+        </div>
+    </div>
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
