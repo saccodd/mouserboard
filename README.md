@@ -1,7 +1,7 @@
 
 # MouserBoard #
 
-### Beta Release: [www.mouserboard.com](https://www.mouserboard.com) ###
+### [UPDATE] Beta Release: [www.mouserboard.com](https://www.mouserboard.com) ###
 
 
 MouserBoard is the board for crypto gamers.
